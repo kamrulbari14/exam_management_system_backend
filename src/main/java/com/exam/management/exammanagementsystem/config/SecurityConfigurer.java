@@ -42,7 +42,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        String allPrefix = "/*";
+        String allPrefix = "/**";
         http.cors()
                 .and()
                 .csrf()
@@ -54,9 +54,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(UrlConstraint.AuthManagement.ROOT + allPrefix,
-                        UrlConstraint.UnAuthorizedEndPoint.RESET_PASSWORD
-                )
+                .antMatchers(allPrefix)
                 .permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

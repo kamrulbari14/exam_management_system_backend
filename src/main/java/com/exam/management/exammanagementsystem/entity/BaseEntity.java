@@ -38,6 +38,5 @@ public class BaseEntity implements Serializable {
     public void setPreUpdateData() {
         this.updateAt = new Date();
         this.updatedBy = AuthUtils.getLoggedInUsername();
-        this.activeStatus = ActiveStatus.ACTIVE.getValue();
     }
 }

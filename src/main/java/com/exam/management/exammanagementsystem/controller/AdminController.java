@@ -1,0 +1,38 @@
+package com.exam.management.exammanagementsystem.controller;
+
+import com.exam.management.exammanagementsystem.annotation.ApiController;
+import com.exam.management.exammanagementsystem.dto.AdminDto;
+import com.exam.management.exammanagementsystem.dto.Response;
+import com.exam.management.exammanagementsystem.service.AdminService;
+import org.springframework.web.bind.annotation.*;
+
+@ApiController
+public class AdminController {
+
+    private final AdminService adminService;
+
+
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
+    }
+
+    @PostMapping("/addAdmin")
+    public Response saveAdmin(@RequestBody AdminDto adminDto){
+        return adminService.saveAdmin(adminDto);
+    }
+
+    @PostMapping("/isAdmin")
+    public Response isAdmin(@RequestBody AdminDto adminDto){
+        return adminService.isAdminOrNot(adminDto.getEmail());
+    }
+
+    @GetMapping("/adminList")
+    public Response getAdminList(){
+        return adminService.getAdminList();
+    }
+
+    @DeleteMapping("/deleteAdmin/{id}")
+    public Response deleteAdmin(@PathVariable Long id){
+        return adminService.deleteAdmin(id);
+    }
+}
