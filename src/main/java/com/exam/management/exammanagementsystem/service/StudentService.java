@@ -16,5 +16,5 @@ public interface StudentService {
 
     Response deleteStudentById(Long id);
 
-    StudentDto updateStudent(StudentDto studentDto);
+    Response updateStudent(StudentDto studentDto);
 }

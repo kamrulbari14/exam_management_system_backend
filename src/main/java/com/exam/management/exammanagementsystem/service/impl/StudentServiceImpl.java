@@ -75,7 +75,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public StudentDto updateStudent(StudentDto studentDto) {
+    public Response updateStudent(StudentDto studentDto) {
         Optional<Student> result = studentRepository.findByIdAndActiveStatus(studentDto.getId(), ActiveStatus.ACTIVE.getValue());
         if (result.isPresent()) {
             modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -83,7 +83,7 @@ public class StudentServiceImpl implements StudentService {
             student.setActiveStatus(ActiveStatus.ACTIVE.getValue());
             studentRepository.save(student);
         }
-        return null;
+        return ResponseBuilder.getSuccessResponse(HttpStatus.ACCEPTED, "", null);
     }
 
     private List<StudentDto> getStudentList(List<Student> students) {
