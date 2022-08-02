@@ -1,21 +1,13 @@
 package com.exam.management.exammanagementsystem.controller;
 
 import com.exam.management.exammanagementsystem.annotation.ApiController;
-import com.exam.management.exammanagementsystem.dto.AdminDto;
 import com.exam.management.exammanagementsystem.dto.Response;
 import com.exam.management.exammanagementsystem.dto.StudentDto;
 import com.exam.management.exammanagementsystem.entity.Student;
 import com.exam.management.exammanagementsystem.service.StudentService;
-import org.apache.commons.io.IOUtils;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @ApiController
@@ -33,12 +25,23 @@ public class StudentController {
     }
 
     @GetMapping("/students")
-    public List<StudentDto> getStudentList(){
+    public List<StudentDto> getStudentList() {
         return studentService.getStudentList();
     }
 
     @GetMapping("/students/{id}")
-    public StudentDto getStudentById(@PathVariable Long id){
+    public StudentDto getStudentById(@PathVariable Long id) {
         return studentService.getStudentById(id);
+    }
+
+    @DeleteMapping("/deleteStudent/{id}")
+    public void deleteStudentById(@PathVariable Long id) {
+        studentService.deleteStudentById(id);
+    }
+
+    @PatchMapping("/updateStudent/{id}")
+    public StudentDto updateStudentById(@RequestBody StudentDto studentDto, @PathVariable Long id) {
+        studentDto.setId(id);
+        return studentService.updateStudent(studentDto);
     }
 }

@@ -63,6 +63,27 @@ public class StudentServiceImpl implements StudentService {
         return null;
     }
 
+    @Override
+    public void deleteStudentById(Long id) {
+        Optional<Student> result = studentRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
+        if (result.isPresent()) {
+            Student student = result.get();
+            student.setActiveStatus(ActiveStatus.DELETE.getValue());
+            studentRepository.save(student);
+        }
+    }
+
+    @Override
+    public StudentDto updateStudent(StudentDto studentDto) {
+        Optional<Student> result = studentRepository.findByIdAndActiveStatus(studentDto.getId(), ActiveStatus.ACTIVE.getValue());
+        if (result.isPresent()) {
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            Student student = modelMapper.map(studentDto, Student.class);
+            studentRepository.save(student);
+        }
+        return null;
+    }
+
     private List<StudentDto> getStudentList(List<Student> students) {
         List<StudentDto> studentDtoList = new ArrayList<>();
         students.forEach(student -> {
