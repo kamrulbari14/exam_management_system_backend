@@ -80,6 +80,7 @@ public class StudentServiceImpl implements StudentService {
         if (result.isPresent()) {
             modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
             Student student = modelMapper.map(studentDto, Student.class);
+            student.setActiveStatus(ActiveStatus.ACTIVE.getValue());
             studentRepository.save(student);
         }
         return null;

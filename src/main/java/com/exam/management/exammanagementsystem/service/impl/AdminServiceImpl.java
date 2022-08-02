@@ -47,14 +47,12 @@ public class AdminServiceImpl implements AdminService {
         if (admins.isEmpty()) {
             return null;
         }
-        List<AdminDto> adminDtos = getAdminList(admins);
-        return adminDtos;
+        return getAdminList(admins);
     }
 
     @Override
     public Boolean isAdminOrNot(String email) {
-        boolean result = adminRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue()).isPresent();
-        return result;
+        return adminRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue()).isPresent();
     }
 
     @Override
