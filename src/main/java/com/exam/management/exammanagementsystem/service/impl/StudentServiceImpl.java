@@ -1,6 +1,5 @@
 package com.exam.management.exammanagementsystem.service.impl;
 
-import com.exam.management.exammanagementsystem.dto.AdminDto;
 import com.exam.management.exammanagementsystem.dto.Response;
 import com.exam.management.exammanagementsystem.dto.StudentDto;
 import com.exam.management.exammanagementsystem.entity.Document;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -36,7 +36,7 @@ public class StudentServiceImpl implements StudentService {
     public Response saveStudent(Student student, MultipartFile file, String docName) {
         student = studentRepository.save(student);
         Document document = documentService.saveDocument(docName, file, Student.class, student.getId());
-        if (student != null && document != null) {
+        if (document != null) {
             return ResponseBuilder.getSuccessResponse(HttpStatus.OK, "Successfull save", null);
         }
         return null;
@@ -48,8 +48,19 @@ public class StudentServiceImpl implements StudentService {
         if (students.isEmpty()) {
             return null;
         }
-        List<StudentDto> studentDtos = getStudentList(students);
-        return studentDtos;
+        return getStudentList(students);
+    }
+
+    @Override
+    public StudentDto getStudentById(Long id) {
+        Optional<Student> result = studentRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
+        if (result.isPresent()) {
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            StudentDto studentDto = modelMapper.map(result.get(), StudentDto.class);
+            studentDto.setImage("/get-file/" + Student.class.getName() + "/" + result.get().getId());
+            return studentDto;
+        }
+        return null;
     }
 
     private List<StudentDto> getStudentList(List<Student> students) {
@@ -57,7 +68,7 @@ public class StudentServiceImpl implements StudentService {
         students.forEach(student -> {
             modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
             StudentDto studentDto = modelMapper.map(student, StudentDto.class);
-            studentDto.setImage("/get-file/"+Student.class.getName()+"/"+student.getId());
+            studentDto.setImage("/get-file/" + Student.class.getName() + "/" + student.getId());
             studentDtoList.add(studentDto);
         });
         return studentDtoList;

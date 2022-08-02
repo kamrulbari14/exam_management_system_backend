@@ -11,4 +11,6 @@ public interface StudentService {
     Response saveStudent(Student employee, MultipartFile file, String docName);
 
     List<StudentDto> getStudentList();
+
+    StudentDto getStudentById(Long id);
 }

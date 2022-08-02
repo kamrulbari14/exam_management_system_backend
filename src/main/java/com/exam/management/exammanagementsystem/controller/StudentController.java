@@ -33,7 +33,12 @@ public class StudentController {
     }
 
     @GetMapping("/students")
-    public List<StudentDto> getAdminList(){
+    public List<StudentDto> getStudentList(){
         return studentService.getStudentList();
+    }
+
+    @GetMapping("/students/{id}")
+    public StudentDto getStudentById(@PathVariable Long id){
+        return studentService.getStudentById(id);
     }
 }
