@@ -14,7 +14,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @Documented
 @Controller
 @CrossOrigin(origins = "*", methods =
-        {GET, POST, PUT, DELETE, OPTIONS})
+        {GET, POST, PUT, DELETE, OPTIONS, PATCH})
 @ResponseBody
 public @interface ApiController {
     @AliasFor(

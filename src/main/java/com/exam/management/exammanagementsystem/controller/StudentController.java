@@ -35,8 +35,8 @@ public class StudentController {
     }
 
     @DeleteMapping("/deleteStudent/{id}")
-    public void deleteStudentById(@PathVariable Long id) {
-        studentService.deleteStudentById(id);
+    public Response deleteStudentById(@PathVariable Long id) {
+        return studentService.deleteStudentById(id);
     }
 
     @PatchMapping("/updateStudent/{id}")

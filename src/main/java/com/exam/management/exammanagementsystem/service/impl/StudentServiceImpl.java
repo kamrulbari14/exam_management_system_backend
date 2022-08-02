@@ -64,13 +64,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void deleteStudentById(Long id) {
+    public Response deleteStudentById(Long id) {
         Optional<Student> result = studentRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
         if (result.isPresent()) {
             Student student = result.get();
             student.setActiveStatus(ActiveStatus.DELETE.getValue());
             studentRepository.save(student);
         }
+        return ResponseBuilder.getSuccessResponse(HttpStatus.ACCEPTED, "", null);
     }
 
     @Override
