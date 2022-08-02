@@ -6,6 +6,8 @@ import com.exam.management.exammanagementsystem.dto.Response;
 import com.exam.management.exammanagementsystem.service.AdminService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @ApiController
 public class AdminController {
 
@@ -22,12 +24,12 @@ public class AdminController {
     }
 
     @PostMapping("/isAdmin")
-    public Response isAdmin(@RequestBody AdminDto adminDto){
+    public Boolean isAdmin(@RequestBody AdminDto adminDto){
         return adminService.isAdminOrNot(adminDto.getEmail());
     }
 
     @GetMapping("/adminList")
-    public Response getAdminList(){
+    public List<AdminDto> getAdminList(){
         return adminService.getAdminList();
     }
 

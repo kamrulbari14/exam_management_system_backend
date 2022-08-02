@@ -42,19 +42,19 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Response getAdminList() {
+    public List<AdminDto> getAdminList() {
         List<Admin> admins = adminRepository.findAllByActiveStatus(ActiveStatus.ACTIVE.getValue());
         if (admins.isEmpty()) {
-            return ResponseBuilder.getFailureResponse(HttpStatus.BAD_REQUEST, root + " list is empty");
+            return null;
         }
         List<AdminDto> adminDtos = getAdminList(admins);
-        return ResponseBuilder.getSuccessResponse(HttpStatus.OK, root + "list retrieved", adminDtos);
+        return adminDtos;
     }
 
     @Override
-    public Response isAdminOrNot(String email) {
+    public Boolean isAdminOrNot(String email) {
         boolean result = adminRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue()).isPresent();
-        return ResponseBuilder.getSuccessResponse(HttpStatus.OK, "", result);
+        return result;
     }
 
     @Override
