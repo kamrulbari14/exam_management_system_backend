@@ -36,12 +36,4 @@ public class StudentController {
     public List<StudentDto> getAdminList(){
         return studentService.getStudentList();
     }
-
-    @GetMapping(value = "/get-file", produces = MediaType.APPLICATION_JSON_VALUE)
-    public byte[] getFile(HttpServletResponse response) throws IOException {
-        File downloadableFile = new File("E:\\projectFileLocation\\com.exam.management.exammanagementsystem.entity.Student\\2022-08-02\\aa629001-c0b4-4e5a-b1e4-ba244386ad95\\87201694_2709310619291971_3302360234604888064_n.jpg");
-        InputStream in = new FileInputStream(downloadableFile);
-        response.setHeader("Content-Disposition", "attachment; filename="+ "CFD_98927.JPG");
-        return IOUtils.toByteArray(in);
-    }
 }

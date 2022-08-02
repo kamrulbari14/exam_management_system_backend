@@ -21,7 +21,7 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
-    @GetMapping(value = "/get-file/{className}/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/get-file/{className}/{id}")
     public byte[] getFile(HttpServletResponse response,
                           @PathVariable String className, @PathVariable Long id) throws IOException {
         Document document = documentService.findDocument(className, id);
