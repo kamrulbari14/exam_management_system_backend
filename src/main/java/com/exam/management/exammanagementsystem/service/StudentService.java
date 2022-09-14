@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface StudentService {
-    Response saveStudent(Student employee, MultipartFile file, String docName);
+    Response saveStudent(Student student, MultipartFile file, String docName);
 
     List<StudentDto> getStudentList();
 
