@@ -17,4 +17,8 @@ public interface TeacherService {
     Response deleteTeacherById(Long id);
 
     Response updateTeacher(TeacherDto teacherDto);
+
+    TeacherDto getTeacherByEmail(String email);
+
+    boolean isTeacherValidation(String email);
 }

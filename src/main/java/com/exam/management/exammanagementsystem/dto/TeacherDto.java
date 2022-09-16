@@ -2,6 +2,8 @@ package com.exam.management.exammanagementsystem.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class TeacherDto extends BaseDto {
     private String name;
@@ -11,4 +13,5 @@ public class TeacherDto extends BaseDto {
     private String mobile;
     private String department;
     private String image;
+    private List<SemesterDto> semester;
 }

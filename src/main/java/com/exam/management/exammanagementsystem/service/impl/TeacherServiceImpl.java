@@ -1,10 +1,13 @@
 package com.exam.management.exammanagementsystem.service.impl;
 
 import com.exam.management.exammanagementsystem.dto.Response;
+import com.exam.management.exammanagementsystem.dto.SemesterDto;
 import com.exam.management.exammanagementsystem.dto.TeacherDto;
 import com.exam.management.exammanagementsystem.entity.Document;
+import com.exam.management.exammanagementsystem.entity.Semester;
 import com.exam.management.exammanagementsystem.entity.Teacher;
 import com.exam.management.exammanagementsystem.enums.ActiveStatus;
+import com.exam.management.exammanagementsystem.repository.SemesterRepository;
 import com.exam.management.exammanagementsystem.repository.TeacherRepository;
 import com.exam.management.exammanagementsystem.service.DocumentService;
 import com.exam.management.exammanagementsystem.service.TeacherService;
@@ -23,11 +26,13 @@ import java.util.Optional;
 public class TeacherServiceImpl implements TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final SemesterRepository semesterRepository;
     private final DocumentService documentService;
     private final ModelMapper modelMapper;
 
-    public TeacherServiceImpl(TeacherRepository teacherRepository, DocumentService documentService, ModelMapper modelMapper) {
+    public TeacherServiceImpl(TeacherRepository teacherRepository, SemesterRepository semesterRepository, DocumentService documentService, ModelMapper modelMapper) {
         this.teacherRepository = teacherRepository;
+        this.semesterRepository = semesterRepository;
         this.documentService = documentService;
         this.modelMapper = modelMapper;
     }
@@ -86,6 +91,39 @@ public class TeacherServiceImpl implements TeacherService {
         return ResponseBuilder.getSuccessResponse(HttpStatus.ACCEPTED, "", null);
     }
 
+    @Override
+    public TeacherDto getTeacherByEmail(String email) {
+        TeacherDto teacherDto = new TeacherDto();
+        Optional<Teacher> result = teacherRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue());
+        if(result.isPresent()){
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            teacherDto = modelMapper.map(result.get(), TeacherDto.class);
+            teacherDto.setImage("/get-file/" + Teacher.class.getName() + "/" + result.get().getId());
+            List<Semester> semesters = semesterRepository.findAllByTeacherAndActiveStatus(result.get(), ActiveStatus.ACTIVE.getValue());
+            if (semesters.isEmpty()) {
+                teacherDto.setSemester(null);
+            }
+            teacherDto.setSemester(getSemesterList(semesters));
+        }
+        return teacherDto;
+    }
+
+    @Override
+    public boolean isTeacherValidation(String email) {
+        Optional<Teacher> result = teacherRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue());
+        if(result.isPresent()){
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            TeacherDto teacherDto = modelMapper.map(result.get(), TeacherDto.class);
+            List<Semester> semesters = semesterRepository.findAllByTeacherAndActiveStatus(result.get(), ActiveStatus.ACTIVE.getValue());
+            if (semesters.isEmpty()) {
+                return false;
+            }
+            teacherDto.setSemester(getSemesterList(semesters));
+            return true;
+        }
+        return false;
+    }
+
     private List<TeacherDto> getTeacherList(List<Teacher> teachers) {
         List<TeacherDto> teacherDtoList = new ArrayList<>();
         teachers.forEach(teacher -> {
@@ -95,5 +133,19 @@ public class TeacherServiceImpl implements TeacherService {
             teacherDtoList.add(teacherDto);
         });
         return teacherDtoList;
+    }
+
+    private List<SemesterDto> getSemesterList(List<Semester> semesters) {
+        List<SemesterDto> semesterDtos = new ArrayList<>();
+        semesters.forEach(semester -> {
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            SemesterDto semesterDto = modelMapper.map(semester, SemesterDto.class);
+            semesterDto.getTeacher().forEach(teacher -> {
+                TeacherDto teacherDto = modelMapper.map(teacher, TeacherDto.class);
+                teacherDto.setImage("/get-file/" + Teacher.class.getName() + "/" + teacher.getId());
+            });
+            semesterDtos.add(semesterDto);
+        });
+        return semesterDtos;
     }
 }

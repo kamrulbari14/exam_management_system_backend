@@ -28,10 +28,9 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public Response saveSession(SessionDto sessionDto) {
-
         if (sessionRepository.findByDepartmentAndSessionAndActiveStatus(sessionDto.getDepartment(), sessionDto.getSession(),
                 ActiveStatus.ACTIVE.getValue()).isPresent()) {
-            return ResponseBuilder.getFailureResponse(HttpStatus.BAD_REQUEST, root + " session already exists under this department");
+            return ResponseBuilder.getFailureResponse(HttpStatus.BAD_REQUEST, root + " already exists under this department");
         }
 
         Session session = modelMapper.map(sessionDto, Session.class);
