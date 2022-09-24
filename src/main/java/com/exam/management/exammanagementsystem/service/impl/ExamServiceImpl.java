@@ -1,8 +1,6 @@
 package com.exam.management.exammanagementsystem.service.impl;
 
-import com.exam.management.exammanagementsystem.dto.ExamDto;
-import com.exam.management.exammanagementsystem.dto.Response;
-import com.exam.management.exammanagementsystem.dto.StudentDto;
+import com.exam.management.exammanagementsystem.dto.*;
 import com.exam.management.exammanagementsystem.entity.*;
 import com.exam.management.exammanagementsystem.enums.ActiveStatus;
 import com.exam.management.exammanagementsystem.repository.*;
@@ -108,6 +106,27 @@ public class ExamServiceImpl implements ExamService {
         exam.setStudents(getStudents(examDto.getStudents()));
         examRepository.save(exam);
         return ResponseBuilder.getSuccessResponse(HttpStatus.CREATED, root + " Has been Created", null);
+    }
+
+    @Override
+    public List<ExamDto> questionsListForTeacher(ExamsByTeacherDto teacherDto) {
+        List<ExamDto> examDtos = new ArrayList<>();
+        Optional<Teacher> teacherOptional = teacherRepository.findByEmailAndActiveStatus
+                (teacherDto.getEmail(), ActiveStatus.ACTIVE.getValue());
+        Optional<Semester> semesterOptional = semesterRepository.findByIdAndActiveStatus
+                (teacherDto.getSemesterId(), ActiveStatus.ACTIVE.getValue());
+        if (teacherOptional.isPresent() && semesterOptional.isPresent()){
+            List<Exam> exams = examRepository.findAllByTeacherNameAndSemester(teacherOptional.get(), semesterOptional.get());
+            exams.forEach(exam -> {
+                ExamDto examDto = new ExamDto();
+                examDto.setId(exam.getId());
+                examDto.setExamName(exam.getExamName());
+                examDto.setMcqCategory(exam.getMcqCategory());
+                examDto.setCategory(exam.getCategory());
+                examDtos.add(examDto);
+            });
+        }
+        return examDtos;
     }
 
     private List<Student> getStudents(List<StudentDto> studentDtos) {
