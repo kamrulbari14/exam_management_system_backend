@@ -24,6 +24,11 @@ public class StudentController {
         return studentService.saveStudent(student, file, "file");
     }
 
+    @PostMapping("/isStudent")
+    public StudentDto getStudentByEmail(@RequestBody StudentDto studentDto) {
+        return studentService.getStudentByEmail(studentDto.getEmail());
+    }
+
     @GetMapping("/students")
     public List<StudentDto> getStudentList() {
         return studentService.getStudentList();
@@ -32,6 +37,11 @@ public class StudentController {
     @GetMapping("/students/{id}")
     public StudentDto getStudentById(@PathVariable Long id) {
         return studentService.getStudentById(id);
+    }
+
+    @GetMapping("/studentsForExam/{department}/{session}")
+    public List<StudentDto> getStudentsForExam(@PathVariable String department, @PathVariable String session) {
+        return studentService.getStudentsForExam(department, session);
     }
 
     @DeleteMapping("/deleteStudent/{id}")

@@ -1,10 +1,13 @@
 package com.exam.management.exammanagementsystem.service.impl;
 
 import com.exam.management.exammanagementsystem.dto.Response;
+import com.exam.management.exammanagementsystem.dto.SemesterDto;
 import com.exam.management.exammanagementsystem.dto.StudentDto;
 import com.exam.management.exammanagementsystem.entity.Document;
+import com.exam.management.exammanagementsystem.entity.Semester;
 import com.exam.management.exammanagementsystem.entity.Student;
 import com.exam.management.exammanagementsystem.enums.ActiveStatus;
+import com.exam.management.exammanagementsystem.repository.SemesterRepository;
 import com.exam.management.exammanagementsystem.repository.StudentRepository;
 import com.exam.management.exammanagementsystem.service.DocumentService;
 import com.exam.management.exammanagementsystem.service.StudentService;
@@ -23,11 +26,13 @@ import java.util.Optional;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
+    private final SemesterRepository semesterRepository;
     private final DocumentService documentService;
     private final ModelMapper modelMapper;
 
-    public StudentServiceImpl(StudentRepository studentRepository, DocumentService documentService, ModelMapper modelMapper) {
+    public StudentServiceImpl(StudentRepository studentRepository, SemesterRepository semesterRepository, DocumentService documentService, ModelMapper modelMapper) {
         this.studentRepository = studentRepository;
+        this.semesterRepository = semesterRepository;
         this.documentService = documentService;
         this.modelMapper = modelMapper;
     }
@@ -84,6 +89,34 @@ public class StudentServiceImpl implements StudentService {
             studentRepository.save(student);
         }
         return ResponseBuilder.getSuccessResponse(HttpStatus.ACCEPTED, "", null);
+    }
+
+    @Override
+    public StudentDto getStudentByEmail(String email) {
+        StudentDto studentDto = new StudentDto();
+        Optional<Student> result = studentRepository.findByEmailAndActiveStatus(email, ActiveStatus.ACTIVE.getValue());
+        if(result.isPresent()){
+            modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+            studentDto = modelMapper.map(result.get(), StudentDto.class);
+            studentDto.setImage("/get-file/" + Student.class.getName() + "/" + result.get().getId());
+            Optional<Semester> semesterResult = semesterRepository.findBySessionAndDepartmentAndActiveStatus
+                    (result.get().getSession(),result.get().getDepartment(), ActiveStatus.ACTIVE.getValue());
+            if (!semesterResult.isPresent()) {
+                studentDto.setSemester(null);
+            }
+            else studentDto.setSemester(modelMapper.map(semesterResult.get(), SemesterDto.class));
+        }
+        return studentDto;
+    }
+
+    @Override
+    public List<StudentDto> getStudentsForExam(String department, String session) {
+        List<Student> students = studentRepository.findAllByDepartmentAndSessionAndActiveStatus
+                (department, session, ActiveStatus.ACTIVE.getValue());
+        if (students.isEmpty()) {
+            return null;
+        }
+        return getStudentList(students);
     }
 
     private List<StudentDto> getStudentList(List<Student> students) {

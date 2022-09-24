@@ -19,4 +19,8 @@ public interface SemesterRepository extends JpaRepository<Semester, Long> {
     List<Semester> findAllByActiveStatus(Integer status);
 
     List<Semester> findAllByTeacherAndActiveStatus(Teacher teacher, Integer status);
+
+    Optional<Semester> findBySessionAndDepartmentAndActiveStatus(String session, String department, Integer status);
+
+    Semester findBySemesterAndActiveStatus(String semester, int value);
 }

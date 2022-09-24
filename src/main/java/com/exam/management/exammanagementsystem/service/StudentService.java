@@ -17,4 +17,8 @@ public interface StudentService {
     Response deleteStudentById(Long id);
 
     Response updateStudent(StudentDto studentDto);
+
+    StudentDto getStudentByEmail(String email);
+
+    List<StudentDto> getStudentsForExam(String department, String session);
 }

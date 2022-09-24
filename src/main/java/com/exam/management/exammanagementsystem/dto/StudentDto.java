@@ -12,4 +12,5 @@ public class StudentDto extends BaseDto {
     private String department;
     private String category;
     private String image;
+    private SemesterDto semester;
 }

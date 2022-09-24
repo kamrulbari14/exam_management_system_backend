@@ -12,4 +12,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllByActiveStatus(Integer status);
 
     Optional<Student> findByIdAndActiveStatus(Long id, Integer status);
+
+    Optional<Student> findByEmailAndActiveStatus(String email, Integer activeStatus);
+
+    List<Student> findAllByDepartmentAndSessionAndActiveStatus(String department, String session, Integer activeStatus);
 }
