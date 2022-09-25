@@ -9,6 +9,8 @@ import java.util.List;
 public interface ExamService {
     Response saveExam(ExamDto examDto);
 
+    Response updateExam(ExamDto examDto);
+
     List<ExamDto> questionsListForTeacher(ExamsByTeacherDto teacherDto);
 
     List<ExamDto> questionsListForStudent(ExamsByTeacherDto teacherDto);
@@ -26,4 +28,10 @@ public interface ExamService {
     ViewResultDto getResultSheetDetails(Long id);
 
     ValidityDto checkValidity(Long examId, Long studentId);
+
+    ExamDto getExam(Long id);
+
+    Response deleteExam(Long id);
+
+    List<ViewResultDto> getResultSheetOfStudent(Long id);
 }

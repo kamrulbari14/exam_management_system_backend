@@ -22,6 +22,16 @@ public class ExamController {
         return examService.saveExam(examDto);
     }
 
+    @PostMapping("/updateQuestion")
+    public Response updateExam(@RequestBody ExamDto examDto) {
+        return examService.updateExam(examDto);
+    }
+
+    @DeleteMapping("/deleteQuestion/{id}")
+    public Response deleteExam(@PathVariable Long id) {
+        return examService.deleteExam(id);
+    }
+
     @PostMapping("/teacherQuestion")
     public List<ExamDto> questionsListForTeacher(@RequestBody ExamsByTeacherDto teacherDto) {
         return examService.questionsListForTeacher(teacherDto);
@@ -36,6 +46,11 @@ public class ExamController {
     @GetMapping("/questionFind/{id}")
     public ExamQuestionDto getExamQuestionForStudent(@PathVariable Long id) {
         return examService.getExamQuestionForStudent(id);
+    }
+
+    @GetMapping("/question/{id}")
+    public ExamDto getExam(@PathVariable Long id) {
+        return examService.getExam(id);
     }
 
     @PostMapping("/submitResult")
@@ -56,6 +71,11 @@ public class ExamController {
     @GetMapping("/getResultSheet/{id}")
     public ResultSheetDto getResultSheet(@PathVariable Long id) {
         return examService.getResultSheet(id);
+    }
+
+    @GetMapping("/resultStudent/{id}")
+    public List<ViewResultDto> getResultSheetOfStudent(@PathVariable Long id) {
+        return examService.getResultSheetOfStudent(id);
     }
 
     @GetMapping("/resultDetails/{id}")

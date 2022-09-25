@@ -114,6 +114,79 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    public Response updateExam(ExamDto examDto) {
+        Exam exam = new Exam();
+        Department department = new Department();
+        Session session = new Session();
+        Optional<Department> departmentOptional = departmentRepository.findByDepartmentAndActiveStatus
+                (examDto.getDepartment(), ActiveStatus.ACTIVE.getValue());
+        if (departmentOptional.isPresent()) {
+            department = departmentOptional.get();
+        }
+        Optional<Session> sessionOptional = sessionRepository.findByDepartmentAndSessionAndActiveStatus
+                (examDto.getDepartment(), examDto.getSession(), ActiveStatus.ACTIVE.getValue());
+        if (sessionOptional.isPresent()) {
+            session = sessionOptional.get();
+        }
+        Semester semester = semesterRepository.findBySemesterAndActiveStatus(examDto.getSemester(),
+                ActiveStatus.ACTIVE.getValue());
+        Teacher teacher = teacherRepository.findByNameAndActiveStatus(examDto.getTeacherName(),
+                ActiveStatus.ACTIVE.getValue());
+
+        List<Questions> questions = new ArrayList<>();
+
+        examDto.getQuestion().forEach(qus -> {
+            Questions mcq = new Questions();
+            if (qus.getCategory() != null) {
+                if (Objects.equals(qus.getCategory(), "mcq")) {
+                    Mcq options = new Mcq();
+                    options.setAnswer1(qus.getAnswer1());
+                    options.setAnswer2(qus.getAnswer2());
+                    options.setAnswer3(qus.getAnswer3());
+                    options.setAnswer4(qus.getAnswer4());
+                    options.setRightAnswer(qus.getRightAnswer());
+                    mcq.setMcq(options);
+                } else if (Objects.equals(qus.getCategory(), "fillInTheGaps")) {
+                    FillInTheGap fill = new FillInTheGap();
+                    fill.setRightAnswer(qus.getRightAnswer());
+                    mcq.setFillInTheGap(fill);
+                }
+            }
+            if(mcq.getId() != null){
+                mcq.setId(mcq.getId());
+            }
+            mcq.setCategory(qus.getCategory());
+            mcq.setQuestionName(qus.getQuestionName());
+            mcq.setQuestionNumber(qus.getQuestionNumber());
+            mcq.setMark(qus.getMark());
+            mcq.setAssignmentDetails(qus.getAssignmentDetails());
+            mcq.setAssignmentCategory(qus.getAssignmentCategory());
+            mcq.setFileCategory(qus.getFileCategory());
+            mcq.setVivaDetails(qus.getVivaDetails());
+            mcq.setAttendanceLink(qus.getAttendanceLink());
+            mcq.setHostLink(qus.getHostLink());
+            questions.add(mcq);
+        });
+        if(examDto.getId() != null){
+            exam.setId(examDto.getId());
+        }
+        exam.setExamName(examDto.getExamName());
+        exam.setDepartment(department);
+        exam.setSession(session);
+        exam.setSemester(semester);
+        exam.setTime(examDto.getTime());
+        exam.setDuration(examDto.getDuration());
+        exam.setTotalQuestion(examDto.getTotalQuestion());
+        exam.setQuestion(questions);
+        exam.setMcqCategory(examDto.getMcqCategory());
+        exam.setTeacherName(teacher);
+        exam.setCategory(examDto.getCategory());
+        exam.setStudents(getStudents(examDto.getStudents()));
+        examRepository.save(exam);
+        return ResponseBuilder.getSuccessResponse(HttpStatus.CREATED, root + " has been created", null);
+    }
+
+    @Override
     public List<ExamDto> questionsListForTeacher(ExamsByTeacherDto teacherDto) {
         List<ExamDto> examDtos = new ArrayList<>();
         Optional<Teacher> teacherOptional = teacherRepository.findByEmailAndActiveStatus
@@ -557,6 +630,153 @@ public class ExamServiceImpl implements ExamService {
             check.setCheck(examResult.isPresent());
         }
         return check;
+    }
+
+    @Override
+    public ExamDto getExam(Long id) {
+        Exam exam = new Exam();
+        ExamDto examDto = new ExamDto();
+        List<QuestionDto> question = new ArrayList<>();
+        Optional<Exam> examOptional = examRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
+        if (examOptional.isPresent()) exam = examOptional.get();
+        if (!exam.getQuestion().isEmpty()) {
+            exam.getQuestion().forEach(qus -> {
+                QuestionDto questionDto = new QuestionDto();
+                if (qus.getMcq() != null) {
+                    questionDto.setAnswer1(qus.getMcq().getAnswer1());
+                    questionDto.setAnswer2(qus.getMcq().getAnswer2());
+                    questionDto.setAnswer3(qus.getMcq().getAnswer3());
+                    questionDto.setAnswer4(qus.getMcq().getAnswer4());
+                    questionDto.setRightAnswer(qus.getMcq().getRightAnswer());
+                } else if (qus.getFillInTheGap() != null) {
+                    questionDto.setRightAnswer(qus.getFillInTheGap().getRightAnswer());
+                }
+                questionDto.setId(qus.getId());
+                questionDto.setCategory(qus.getCategory());
+                questionDto.setQuestionName(qus.getQuestionName());
+                questionDto.setQuestionNumber(qus.getQuestionNumber());
+                questionDto.setMark(qus.getMark());
+                questionDto.setAssignmentCategory(qus.getAssignmentCategory());
+                questionDto.setAssignmentDetails(qus.getAssignmentDetails());
+                questionDto.setFileCategory(qus.getFileCategory());
+                questionDto.setVivaDetails(qus.getVivaDetails());
+                questionDto.setAttendanceLink(qus.getAttendanceLink());
+                questionDto.setHostLink(qus.getHostLink());
+                question.add(questionDto);
+            });
+        }
+        examDto.setId(exam.getId());
+        examDto.setQuestion(question);
+        examDto.setExamName(exam.getExamName());
+        examDto.setDepartment(exam.getDepartment().getDepartment());
+        examDto.setSession(exam.getSession().getSession());
+        examDto.setSemester(exam.getSemester().getSemester());
+        examDto.setTime(exam.getTime());
+        examDto.setDuration(exam.getDuration());
+        examDto.setTotalQuestion(exam.getTotalQuestion());
+        examDto.setMcqCategory(exam.getMcqCategory());
+        examDto.setTeacherName(exam.getTeacherName().getName());
+        examDto.setEmail(exam.getTeacherName().getEmail());
+        examDto.setCategory(exam.getCategory());
+
+        return examDto;
+    }
+
+    @Override
+    public Response deleteExam(Long id) {
+        Optional<Exam> examOptional = examRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
+        if (examOptional.isPresent()){
+            Exam exam = examOptional.get();
+            exam.setActiveStatus(ActiveStatus.DELETE.getValue());
+            examRepository.save(exam);
+        }
+        return ResponseBuilder.getSuccessResponse(HttpStatus.OK, "Deleted successfully", null);
+    }
+
+    @Override
+    public List<ViewResultDto> getResultSheetOfStudent(Long id) {
+        Optional<Student> studentOptional = studentRepository.findByIdAndActiveStatus(id,ActiveStatus.ACTIVE.getValue());
+        if (studentOptional.isPresent()){
+            ResultSheetDto resultSheet = new ResultSheetDto();
+            ExamDto examDto = new ExamDto();
+            List<ViewResultDto> presentStudents = new ArrayList<>();
+            List<ExamResult> examResults = examResultRepository.findAllByStudentAndActiveStatus(studentOptional.get(), ActiveStatus.ACTIVE.getValue());
+            examResults.forEach(examResult -> {
+                Double obtainedMark = examResult.getAnswers().stream().map(Answers::getObtainedMark).filter(Objects::nonNull).mapToDouble(Double::doubleValue).sum();
+                Double totalMark = examResult.getExam().getQuestion().stream().map(Questions::getMark).mapToDouble(Double::doubleValue).sum();
+                ViewResultDto resultDetails = new ViewResultDto();
+                List<AnswerDto> answerDtos = new ArrayList<>();
+                List<AnswerDto> notAnswerDtos = new ArrayList<>();
+                examResult.getExam().getQuestion().forEach(question -> {
+                    AnswerDto answerDto = new AnswerDto();
+                    Answers answer = examResult.getAnswers().stream()
+                            .filter(ans -> Objects.equals(ans.getQuestion().getId(), question.getId()))
+                            .findAny().orElse(null);
+                    answerDto.setQuestionNumber(question.getQuestionNumber());
+                    answerDto.setCategory(question.getCategory());
+                    answerDto.setQuestionName(question.getQuestionName());
+                    answerDto.setAssignmentCategory(question.getAssignmentCategory());
+                    answerDto.setAssignmentDetails(question.getAssignmentDetails());
+                    if (question.getCategory() != null) {
+                        if (Objects.equals(question.getCategory(), "mcq")) {
+                            answerDto.setAnswer1(question.getMcq().getAnswer1());
+                            answerDto.setAnswer2(question.getMcq().getAnswer2());
+                            answerDto.setAnswer3(question.getMcq().getAnswer3());
+                            answerDto.setAnswer4(question.getMcq().getAnswer4());
+                            answerDto.setRightAnswer(question.getMcq().getRightAnswer());
+                        } else if (Objects.equals(question.getCategory(), "fillInTheGaps")) {
+                            answerDto.setRightAnswer(question.getFillInTheGap().getRightAnswer());
+                        }
+                    }
+                    answerDto.setMark(question.getMark());
+                    if (answer != null) {
+                        answerDto.setGivenAnswer(answer.getGivenAnswer());
+                        answerDto.setAnswer(answer.getAnswer());
+                        answerDto.setObtainedMark(answer.getObtainedMark());
+                        answerDto.setStatus(answer.getStatus());
+                        answerDto.setId(answer.getId());
+                        answerDtos.add(answerDto);
+                    } else {
+                        if (question.getAssignmentCategory() != null) {
+                            answerDto.setAnswer("/get-file/" + ExamResult.class.getName() + "/" + examResult.getId());
+                            answerDtos.add(answerDto);
+                        } else {
+                            notAnswerDtos.add(answerDto);
+                        }
+                    }
+                });
+
+                AnswerDataDto answerDataDto = new AnswerDataDto();
+
+                answerDataDto.setAnswer(answerDtos);
+                answerDataDto.setNotAnswer(notAnswerDtos);
+
+                resultDetails.setQuestionId(examResult.getExam().getId());
+                resultDetails.setExamName(examResult.getExam().getExamName());
+                resultDetails.setCategory(examResult.getExam().getCategory());
+                resultDetails.setTeacherName(examResult.getExam().getTeacherName().getName());
+                resultDetails.setTeacherEmail(examResult.getExam().getTeacherName().getEmail());
+                resultDetails.setTime(examResult.getExam().getTime());
+                resultDetails.setDuration(examResult.getExam().getDuration());
+                resultDetails.setSemester(examResult.getExam().getSemester().getSemester());
+                resultDetails.setDepartment(examResult.getExam().getDepartment().getDepartment());
+                resultDetails.setSession(examResult.getExam().getSession().getSession());
+                resultDetails.setTotalQuestion(examResult.getExam().getTotalQuestion());
+                resultDetails.setStudentId(examResult.getStudent().getId());
+                resultDetails.setStudentEmail(examResult.getStudent().getEmail());
+                resultDetails.setStudentName(examResult.getStudent().getName());
+                resultDetails.setStudentRoll(examResult.getStudent().getRoll());
+                resultDetails.setStatus(examResult.getStatus());
+                resultDetails.setTotalMark(totalMark);
+                resultDetails.setObtainedMark(obtainedMark);
+                resultDetails.setAnswerData(answerDataDto);
+                resultDetails.setId(examResult.getId());
+                presentStudents.add(resultDetails);
+            });
+            resultSheet.setQuestion(examDto);
+            return presentStudents;
+        }
+        return null;
     }
 
 

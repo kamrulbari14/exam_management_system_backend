@@ -18,4 +18,6 @@ public interface ExamResultRepository extends JpaRepository<ExamResult, Long> {
     ExamResult findByIdAndActiveStatus(Long id, Integer activeStatus);
 
     Optional<ExamResult> findByExamAndStudentAndActiveStatus(Exam exam, Student student, Integer activeStatus);
+
+    List<ExamResult> findAllByStudentAndActiveStatus(Student student, Integer activeStatus);
 }

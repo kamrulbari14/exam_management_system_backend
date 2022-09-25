@@ -19,6 +19,7 @@ public class ExamDto extends BaseDto {
     private List<QuestionDto> question;
     private String mcqCategory;
     private String teacherName;
+    private String email;
     private String category;
     private List<StudentDto> students;
 }
