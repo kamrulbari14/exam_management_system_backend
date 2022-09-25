@@ -152,7 +152,7 @@ public class ExamServiceImpl implements ExamService {
                     mcq.setFillInTheGap(fill);
                 }
             }
-            if(mcq.getId() != null){
+            if (mcq.getId() != null) {
                 mcq.setId(mcq.getId());
             }
             mcq.setCategory(qus.getCategory());
@@ -167,7 +167,7 @@ public class ExamServiceImpl implements ExamService {
             mcq.setHostLink(qus.getHostLink());
             questions.add(mcq);
         });
-        if(examDto.getId() != null){
+        if (examDto.getId() != null) {
             exam.setId(examDto.getId());
         }
         exam.setExamName(examDto.getExamName());
@@ -373,8 +373,7 @@ public class ExamServiceImpl implements ExamService {
                 examResult.setStatus("Checked");
             }
             examResultRepository.save(examResult);
-        }
-        else {
+        } else {
             Exam exam = new Exam();
             Student student = new Student();
             ExamResult examResult = new ExamResult();
@@ -388,7 +387,7 @@ public class ExamServiceImpl implements ExamService {
                 student = studentOptional.get();
             }
 
-            exam.getQuestion().forEach(qus ->{
+            exam.getQuestion().forEach(qus -> {
                 answer.setStatus("Not Checked");
                 answer.setQuestion(qus);
             });
@@ -481,19 +480,18 @@ public class ExamServiceImpl implements ExamService {
                 }
                 answerDto.setMark(question.getMark());
                 if (answer != null) {
+                    if (question.getAssignmentCategory() != null) {
+                        answerDto.setAnswer("/get-file/" + ExamResult.class.getName() + "/" + examResult.getId());
+                    } else {
+                        answerDto.setAnswer(answer.getAnswer());
+                    }
                     answerDto.setGivenAnswer(answer.getGivenAnswer());
-                    answerDto.setAnswer(answer.getAnswer());
                     answerDto.setObtainedMark(answer.getObtainedMark());
                     answerDto.setStatus(answer.getStatus());
                     answerDto.setId(answer.getId());
                     answerDtos.add(answerDto);
                 } else {
-                    if (question.getAssignmentCategory() != null) {
-                        answerDto.setAnswer("/get-file/" + ExamResult.class.getName() + "/" + examResult.getId());
-                        answerDtos.add(answerDto);
-                    } else {
-                        notAnswerDtos.add(answerDto);
-                    }
+                    notAnswerDtos.add(answerDto);
                 }
             });
 
@@ -567,19 +565,18 @@ public class ExamServiceImpl implements ExamService {
             }
             answerDto.setMark(question.getMark());
             if (answer != null) {
+                if (question.getAssignmentCategory() != null) {
+                    answerDto.setAnswer("/get-file/" + ExamResult.class.getName() + "/" + examResult.getId());
+                } else {
+                    answerDto.setAnswer(answer.getAnswer());
+                }
                 answerDto.setGivenAnswer(answer.getGivenAnswer());
-                answerDto.setAnswer(answer.getAnswer());
                 answerDto.setObtainedMark(answer.getObtainedMark());
                 answerDto.setStatus(answer.getStatus());
                 answerDto.setId(answer.getId());
                 answerDtos.add(answerDto);
             } else {
-                if (question.getAssignmentCategory() != null) {
-                    answerDto.setAnswer("/get-file/" + ExamResult.class.getName() + "/" + examResult.getId());
-                    answerDtos.add(answerDto);
-                } else {
-                    notAnswerDtos.add(answerDto);
-                }
+                notAnswerDtos.add(answerDto);
             }
         });
 
@@ -685,7 +682,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Response deleteExam(Long id) {
         Optional<Exam> examOptional = examRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
-        if (examOptional.isPresent()){
+        if (examOptional.isPresent()) {
             Exam exam = examOptional.get();
             exam.setActiveStatus(ActiveStatus.DELETE.getValue());
             examRepository.save(exam);
@@ -695,8 +692,8 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public List<ViewResultDto> getResultSheetOfStudent(Long id) {
-        Optional<Student> studentOptional = studentRepository.findByIdAndActiveStatus(id,ActiveStatus.ACTIVE.getValue());
-        if (studentOptional.isPresent()){
+        Optional<Student> studentOptional = studentRepository.findByIdAndActiveStatus(id, ActiveStatus.ACTIVE.getValue());
+        if (studentOptional.isPresent()) {
             ResultSheetDto resultSheet = new ResultSheetDto();
             ExamDto examDto = new ExamDto();
             List<ViewResultDto> presentStudents = new ArrayList<>();
