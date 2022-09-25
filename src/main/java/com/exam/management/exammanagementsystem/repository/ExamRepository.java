@@ -7,9 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExamRepository extends JpaRepository<Exam, Long> {
 
-    List<Exam> findAllByTeacherNameAndSemester(Teacher teacher, Semester semester);
+    List<Exam> findAllByTeacherNameAndSemesterAndActiveStatus(Teacher teacher, Semester semester, Integer activeStatus);
+
+    List<Exam> findAllBySemesterAndActiveStatus(Semester semester, Integer activeStatus);
+
+    Optional<Exam> findByIdAndActiveStatus(Long id, Integer activeStatus);
 }

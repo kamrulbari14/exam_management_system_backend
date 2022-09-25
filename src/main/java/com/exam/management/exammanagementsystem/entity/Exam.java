@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Exam extends BaseEntity {
     @OneToOne
     private Semester semester;
 
-    private LocalDate time;
+    private LocalDateTime time;
 
     private Integer duration;
 
